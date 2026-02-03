@@ -25,6 +25,15 @@
             100% {background-position: 0% 50%;}
         }
 
+        /* --- GOD MODE FIX: The Game Over Class --- */
+        /* This rule forces the button to hide no matter what */
+        body.game-over .no {
+            display: none !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+            visibility: hidden !important;
+        }
+
         /* --- OVERLAY --- */
         #overlay {
             position: fixed;
@@ -134,7 +143,7 @@
         .no {
             background:#F50057;
             color:white;
-            z-index: 100; /* Low priority initially */
+            z-index: 100;
         }
         
         /* HEARTS */
@@ -171,7 +180,7 @@
             width:100vw;
             height:100vh;
             background:rgba(255,105,180,0.95);
-            /* NUCLEAR FIX: Z-Index set to maximum possible number */
+            /* EXTREME Z-INDEX to ensure it's on top */
             z-index: 2147483647; 
         }
         .modal-content {
@@ -233,7 +242,7 @@
     </div>
 
     <script>
-        var gameEnded = false; // Flag to stop button movement
+        var gameEnded = false; 
 
         function startEverything() {
             var music = document.getElementById("bgMusic");
@@ -267,11 +276,15 @@
         }
 
         function yesClick() {
-            gameEnded = true; // Stop the 'No' button logic
+            gameEnded = true; 
             
-            // NUCLEAR FIX: Find the button and delete it from the universe
+            // 1. ADD CLASS TO BODY - The CSS rule 'body.game-over .no' will instantly hide it
+            document.body.classList.add("game-over");
+
+            // 2. DELETE FROM HTML - The standard way
             var noBtn = document.getElementById('noBtn');
             if (noBtn) {
+                noBtn.style.display = 'none';
                 noBtn.remove(); 
             }
 
@@ -279,15 +292,14 @@
         }
         
         function moveButton() {
-            if (gameEnded) return; // Don't run if we already said Yes
+            if (gameEnded) return; 
 
             var noBtn = document.getElementById('noBtn');
             
-            // Move to body if needed, but keep z-index lower than modal
             if (noBtn.parentElement.tagName !== 'BODY') {
                 document.body.appendChild(noBtn);
                 noBtn.style.position = 'fixed'; 
-                noBtn.style.zIndex = '5000'; // High, but lower than Modal's 2 billion
+                noBtn.style.zIndex = '5000'; 
             }
 
             var windowWidth = window.innerWidth;
@@ -307,10 +319,10 @@
         }
         
         function showFinalMessage() {
+            document.body.classList.add("game-over"); // Ensure class is present
             document.getElementById('modal').style.display = 'none';
             document.getElementById('mainContainer').style.display = 'none';
             
-            // Double tap delete just to be safe
             var noBtn = document.getElementById('noBtn');
             if (noBtn) noBtn.remove();
             
