@@ -73,6 +73,8 @@
             box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
             border: 1px solid rgba(255, 255, 255, 0.18);
             animation: fadeIn 2s;
+            /* Ensure container doesn't trap the button */
+            transform-style: preserve-3d;
         }
 
         /* FINAL MESSAGE CONTAINER */
@@ -129,12 +131,12 @@
             background:#F06292;
             color: white;
         }
+        
         .no {
             background:#F50057;
             color:white;
-            /* FIXED: Ensures button stays on top when moving */
-            position: fixed; 
-            z-index: 1000;
+            /* FIX 1: Removed 'position: fixed' here. It is now normal by default. */
+            z-index: 100;
         }
         
         /* HEARTS */
@@ -275,9 +277,11 @@
         function moveButton() {
             var noBtn = document.getElementById('noBtn');
             
-            // FIXED: Only move to body if it's not already there
+            // FIX 2: Only apply 'fixed' positioning AFTER we move it to the body
             if (noBtn.parentElement.tagName !== 'BODY') {
                 document.body.appendChild(noBtn);
+                noBtn.style.position = 'fixed'; // Now it floats
+                noBtn.style.zIndex = '9999';    // Force it to the very top
             }
 
             var windowWidth = window.innerWidth;
@@ -286,7 +290,6 @@
             var btnWidth = noBtn.offsetWidth;
             var btnHeight = noBtn.offsetHeight;
 
-            // Ensure button stays within the screen
             var maxLeft = windowWidth - btnWidth - 20;
             var maxTop = windowHeight - btnHeight - 20;
 
@@ -301,14 +304,9 @@
         }
         
         function showFinalMessage() {
-            // Hide the popup
             document.getElementById('modal').style.display = 'none';
-            // Hide the original Yes/No buttons
             document.getElementById('mainContainer').style.display = 'none';
-            // Hide the No button if it's floating around
             document.getElementById('noBtn').style.display = 'none';
-            
-            // Show the final big message
             document.getElementById('finalMessage').style.display = 'block';
         }
     </script>
