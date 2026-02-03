@@ -25,7 +25,7 @@
             100% {background-position: 0% 50%;}
         }
 
-        /* --- OVERLAY (Music Fix) --- */
+        /* --- OVERLAY --- */
         #overlay {
             position: fixed;
             top: 0;
@@ -134,7 +134,7 @@
         .no {
             background:#F50057;
             color:white;
-            z-index: 100;
+            z-index: 100; /* Low priority initially */
         }
         
         /* HEARTS */
@@ -171,7 +171,8 @@
             width:100vw;
             height:100vh;
             background:rgba(255,105,180,0.95);
-            z-index:2000; /* Increased Z-Index to be above everything */
+            /* NUCLEAR FIX: Z-Index set to maximum possible number */
+            z-index: 2147483647; 
         }
         .modal-content {
             position:absolute;
@@ -232,6 +233,8 @@
     </div>
 
     <script>
+        var gameEnded = false; // Flag to stop button movement
+
         function startEverything() {
             var music = document.getElementById("bgMusic");
             var statusText = document.getElementById("statusText");
@@ -264,18 +267,27 @@
         }
 
         function yesClick() {
-            // FIX: Hide the No button immediately when Yes is clicked
-            document.getElementById('noBtn').style.display = 'none'; 
+            gameEnded = true; // Stop the 'No' button logic
+            
+            // NUCLEAR FIX: Find the button and delete it from the universe
+            var noBtn = document.getElementById('noBtn');
+            if (noBtn) {
+                noBtn.remove(); 
+            }
+
             document.getElementById('modal').style.display = 'block';
         }
         
         function moveButton() {
+            if (gameEnded) return; // Don't run if we already said Yes
+
             var noBtn = document.getElementById('noBtn');
             
+            // Move to body if needed, but keep z-index lower than modal
             if (noBtn.parentElement.tagName !== 'BODY') {
                 document.body.appendChild(noBtn);
                 noBtn.style.position = 'fixed'; 
-                noBtn.style.zIndex = '9999';   
+                noBtn.style.zIndex = '5000'; // High, but lower than Modal's 2 billion
             }
 
             var windowWidth = window.innerWidth;
@@ -298,12 +310,9 @@
             document.getElementById('modal').style.display = 'none';
             document.getElementById('mainContainer').style.display = 'none';
             
-            // DOUBLE CHECK: Make sure No Button is gone for good
+            // Double tap delete just to be safe
             var noBtn = document.getElementById('noBtn');
-            if(noBtn) {
-                noBtn.style.display = 'none';
-                noBtn.remove(); // Completely delete it from the HTML to be safe
-            }
+            if (noBtn) noBtn.remove();
             
             document.getElementById('finalMessage').style.display = 'block';
         }
