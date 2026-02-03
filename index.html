@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Behess</title>
+    <style>
+        * {margin:0;padding:0;box-sizing:border-box;}
+        body {
+            height:100vh;
+            display:flex;
+            flex-direction:column;
+            justify-content:center;
+            align-items:center;
+            /* ROMANTIC BACKGROUND */
+            background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #ffd1ff, #a18cd1);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            font-family:Arial, sans-serif;
+            overflow:hidden; 
+            position:relative;
+        }
+
+        @keyframes gradientBG {
+            0% {background-position: 0% 50%;}
+            50% {background-position: 100% 50%;}
+            100% {background-position: 0% 50%;}
+        }
+
+        /* --- OVERLAY (Music Fix) --- */
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: white;
+            transition: opacity 1s ease;
+        }
+        
+        #overlay button {
+            background: #FF69B4;
+            color: white;
+            font-size: 2em;
+            padding: 20px 50px;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(255, 105, 180, 0.8);
+            animation: pulse 1.5s infinite;
+            margin-bottom: 20px;
+        }
+
+        #statusText {
+            font-size: 1.2em;
+            color: #ddd;
+            margin-top: 10px;
+        }
+
+        /* MAIN CONTAINER */
+        .container {
+            display: none; /* Hidden until music starts */
+            z-index: 10;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.3);
+            padding: 40px;
+            border-radius: 30px;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            animation: fadeIn 2s;
+            transform-style: preserve-3d;
+        }
+
+        /* FINAL MESSAGE CONTAINER */
+        #finalMessage {
+            display: none; /* Hidden until the end */
+            z-index: 20;
+            text-align: center;
+            color: white;
+            padding: 20px;
+            animation: zoomIn 1.5s ease;
+            text-shadow: 2px 2px 10px rgba(213, 0, 109, 0.8);
+        }
+
+        #finalMessage h1 {
+            font-size: 3.5em;
+            line-height: 1.2;
+        }
+
+        @keyframes fadeIn {
+            from {opacity: 0; transform: translateY(20px);}
+            to {opacity: 1; transform: translateY(0);}
+        }
+
+        @keyframes zoomIn {
+            from {opacity: 0; transform: scale(0.5);}
+            to {opacity: 1; transform: scale(1);}
+        }
+
+        h1 {
+            color:#fff;
+            font-size:3em;
+            margin-bottom:10px;
+            text-shadow: 2px 2px 4px rgba(213, 0, 109, 0.5);
+        }
+        
+        button {
+            padding:20px 40px;
+            font-size:1.5em;
+            margin:10px;
+            border:none;
+            border-radius:25px;
+            cursor:pointer;
+            font-weight:bold;
+            transition:all 0.3s;
+            position: relative;
+        }
+        .yes {
+            background:#ffffff;
+            color:#D5006D;
+            box-shadow: 0 5px 15px rgba(255, 255, 255, 0.4);
+        }
+        .yes:hover {
+            transform:scale(1.05);
+            background:#F06292;
+            color: white;
+        }
+        
+        .no {
+            background:#F50057;
+            color:white;
+            z-index: 100;
+        }
+        
+        /* HEARTS */
+        .heart {
+            position:absolute;
+            width:20px;
+            height:20px;
+            background:#FF69B4;
+            transform:rotate(-45deg);
+            opacity: 0.7;
+            z-index: 1;
+            bottom: -10vh;
+            animation: floatUp linear forwards;
+        }
+        .heart:before, .heart:after {
+            content:""; position:absolute; width:20px; height:20px;
+            background:inherit; border-radius:50%;
+        }
+        .heart:before {top:-10px; left:0;}
+        .heart:after {left:-10px; top:0;}
+        
+        @keyframes floatUp {
+            0% {transform:translateY(0) rotate(-45deg) scale(0.5); opacity:0;}
+            10% {opacity:0.8; transform:translateY(-10vh) rotate(-45deg) scale(1);}
+            100% {transform:translateY(-110vh) rotate(-45deg) scale(1); opacity:0;}
+        }
+
+        /* MODAL */
+        .modal {
+            display:none;
+            position:fixed;
+            top:0;
+            left:0;
+            width:100vw;
+            height:100vh;
+            background:rgba(255,105,180,0.95);
+            z-index:2000; /* Increased Z-Index to be above everything */
+        }
+        .modal-content {
+            position:absolute;
+            top:50%;
+            left:50%;
+            transform:translate(-50%,-50%);
+            text-align:center;
+            color:white;
+            width: 90%;
+            max-width: 500px;
+        }
+        .gif-container {
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto 20px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(255,255,255,0.5);
+        }
+        .gif-container img { width: 100%; height: auto; display: block; }
+        
+        @keyframes pulse { 0%,100% {transform:scale(1);} 50% {transform:scale(1.05);} }
+    </style>
+</head>
+<body>
+
+    <div id="overlay">
+        <h1>For Behess 💝</h1>
+        <br>
+        <button onclick="startEverything()">Click to Open 💌</button>
+        <p id="statusText">Ready...</p>
+    </div>
+
+    <audio id="bgMusic" loop>
+        <source src="song.mp3" type="audio/mp3">
+    </audio>
+
+    <div class="container" id="mainContainer">
+        <h1>Will you be my Valentine, BEHES CUM HONEY?</h1>
+        <button class="yes" onclick="yesClick()">Yes 💕</button>
+        <button class="no" id="noBtn" onmouseover="moveButton()" onclick="moveButton()">No</button>
+    </div>
+
+    <div id="finalMessage">
+        <h1>Thank you for always being here ❤️</h1>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="gif-container">
+                <img src="https://media.tenor.com/gUiu1zyxfzYAAAAi/bear-kiss-bear-kisses.gif" alt="Cute Bear Kiss">
+            </div>
+            <h2>💕 YES BEHESS! 💕</h2>
+            <p>Promise to be me with forever! 😍❤️</p>
+            <br>
+            <button onclick="showFinalMessage()">💖 Let's Go! 💖</button>
+        </div>
+    </div>
+
+    <script>
+        function startEverything() {
+            var music = document.getElementById("bgMusic");
+            var statusText = document.getElementById("statusText");
+            
+            statusText.innerText = "Attempting to play music...";
+
+            music.play().then(() => {
+                statusText.innerText = "Music Playing!";
+                document.getElementById("overlay").style.opacity = "0";
+                setTimeout(() => {
+                    document.getElementById("overlay").style.display = "none";
+                    document.getElementById("mainContainer").style.display = "block";
+                }, 1000);
+                setInterval(createHeart, 300);
+            }).catch((error) => {
+                console.log(error);
+                statusText.innerText = "Error: Could not find 'song.mp3'!";
+                alert("I couldn't find the music file! \n\nPlease make sure you downloaded a song, renamed it to 'song.mp3', and put it in the same folder as this HTML file.");
+            });
+        }
+
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            heart.style.left = Math.random() * 100 + "vw";
+            const duration = Math.random() * 4 + 3;
+            heart.style.animationDuration = duration + "s";
+            document.body.appendChild(heart);
+            setTimeout(() => { heart.remove(); }, duration * 1000);
+        }
+
+        function yesClick() {
+            // FIX: Hide the No button immediately when Yes is clicked
+            document.getElementById('noBtn').style.display = 'none'; 
+            document.getElementById('modal').style.display = 'block';
+        }
+        
+        function moveButton() {
+            var noBtn = document.getElementById('noBtn');
+            
+            if (noBtn.parentElement.tagName !== 'BODY') {
+                document.body.appendChild(noBtn);
+                noBtn.style.position = 'fixed'; 
+                noBtn.style.zIndex = '9999';   
+            }
+
+            var windowWidth = window.innerWidth;
+            var windowHeight = window.innerHeight;
+            var btnWidth = noBtn.offsetWidth;
+            var btnHeight = noBtn.offsetHeight;
+            var maxLeft = windowWidth - btnWidth - 20;
+            var maxTop = windowHeight - btnHeight - 20;
+            var newLeft = Math.random() * maxLeft;
+            var newTop = Math.random() * maxTop;
+
+            if (newLeft < 20) newLeft = 20;
+            if (newTop < 20) newTop = 20;
+
+            noBtn.style.left = newLeft + 'px';
+            noBtn.style.top = newTop + 'px';
+        }
+        
+        function showFinalMessage() {
+            document.getElementById('modal').style.display = 'none';
+            document.getElementById('mainContainer').style.display = 'none';
+            
+            // DOUBLE CHECK: Make sure No Button is gone for good
+            var noBtn = document.getElementById('noBtn');
+            if(noBtn) {
+                noBtn.style.display = 'none';
+                noBtn.remove(); // Completely delete it from the HTML to be safe
+            }
+            
+            document.getElementById('finalMessage').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
