@@ -132,6 +132,9 @@
         .no {
             background:#F50057;
             color:white;
+            /* FIXED: Ensures button stays on top when moving */
+            position: fixed; 
+            z-index: 1000;
         }
         
         /* HEARTS */
@@ -272,13 +275,10 @@
         function moveButton() {
             var noBtn = document.getElementById('noBtn');
             
-            // --- CRITICAL FIX START ---
-            if (noBtn.parentElement.id !== 'body') {
+            // FIXED: Only move to body if it's not already there
+            if (noBtn.parentElement.tagName !== 'BODY') {
                 document.body.appendChild(noBtn);
             }
-            // --- CRITICAL FIX END ---
-
-            noBtn.style.position = 'fixed'; 
 
             var windowWidth = window.innerWidth;
             var windowHeight = window.innerHeight;
@@ -286,6 +286,7 @@
             var btnWidth = noBtn.offsetWidth;
             var btnHeight = noBtn.offsetHeight;
 
+            // Ensure button stays within the screen
             var maxLeft = windowWidth - btnWidth - 20;
             var maxTop = windowHeight - btnHeight - 20;
 
